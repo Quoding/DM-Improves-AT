@@ -29,11 +29,12 @@ from gowal21uncovering.utils import WATrainer
 # parse.add_argument("--tau", type=float, default=0.995, help="Weight averaging decay.")
 # args = parse.parse_args()
 #
+loc = os.environ["SLURM_TMPDIR"]
 args_dict = {
     "augment": "base",
     "batch_size": 512,
     "batch_size_validation": 512,
-    "data_dir": "dataset-data",
+    "data_dir": f"{loc}/dataset-data",
     "log_dir": "tiny_edm_models",
     "data": "tiny-imagenets",
     "desc": "WRN28-10Swish_tiny_lr0p2_CrossEntLoss_epoch400_bs512_fraction0p8_ls0p1_seed0_attackstep2_edm",
@@ -56,7 +57,7 @@ args_dict = {
     "debug": False,
     "mart": False,
     "unsup_fraction": 0.8,
-    "aux_data_filename": "./edm_data/tiny/1m.npz",
+    "aux_data_filename": f"{loc}/edm_data/tiny/1m.npz",
     "seed": 0,
     "consistency": False,
     "cons_lambda": 1.0,
@@ -184,20 +185,23 @@ for epoch in range(start_epoch, NUM_ADV_EPOCHS + 1):
         }
     )
 
-    if epoch % args.adv_eval_freq == 0 or epoch == NUM_ADV_EPOCHS:
-        test_adv_acc = trainer.eval(test_dataloader, adversarial=True)
-        logger.log(
-            "Adversarial Accuracy-\tTrain: {:.2f}%.\tTest: {:.2f}%.".format(
-                res["adversarial_acc"] * 100, test_adv_acc * 100
-            )
-        )
-        epoch_metrics.update({"test_adversarial_acc": test_adv_acc})
-    else:
-        logger.log(
-            "Adversarial Accuracy-\tTrain: {:.2f}%.".format(
-                res["adversarial_acc"] * 100
-            )
-        )
+    # INFO: This is just tracking adversarial training, which we do not do.
+    # if epoch % args.adv_eval_freq == 0 or epoch == NUM_ADV_EPOCHS:
+    #     test_adv_acc = trainer.eval(test_dataloader, adversarial=True)
+    #     logger.log(
+    #         "Adversarial Accuracy-\tTrain: {:.2f}%.\tTest: {:.2f}%.".format(
+    #             res["adversarial_acc"] * 100, test_adv_acc * 100
+    #         )
+    #     )
+    #     epoch_metrics.update({"test_adversarial_acc": test_adv_acc})
+    # else:
+    #     logger.log(
+    #         "Adversarial Accuracy-\tTrain: {:.2f}%.".format(
+    #             res["adversarial_acc"] * 100
+    #         )
+    #     )
+
+    # INFO: This must have adversarial = False - this is how new best models are found, but since we dont care about adv training...
     eval_adv_acc = trainer.eval(eval_dataloader, adversarial=False)
     logger.log("Adversarial Accuracy-\tEval: {:.2f}%.".format(eval_adv_acc * 100))
     epoch_metrics["eval_adversarial_acc"] = eval_adv_acc
