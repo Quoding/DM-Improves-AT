@@ -231,11 +231,11 @@ logger.log(
         train_acc * 100, old_score[0] * 100
     )
 )
-if NUM_ADV_EPOCHS > 0:
-    logger.log(
-        "Adversarial Accuracy-\tTrain: {:.2f}%.\tEval: {:.2f}%.".format(
-            res["adversarial_acc"] * 100, old_score[1] * 100
-        )
-    )
+# if NUM_ADV_EPOCHS > 0:
+#     logger.log(
+#         "Adversarial Accuracy-\tTrain: {:.2f}%.\tEval: {:.2f}%.".format(
+#             res["adversarial_acc"] * 100, old_score[1] * 100
+#         )
+#     )
 
 logger.log("Script Completed.")
